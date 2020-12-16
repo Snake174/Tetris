@@ -8,10 +8,10 @@ public class Shape : MonoBehaviour
     {
         foreach (Transform child in transform)
         {
-            Vector2 v = PlayField.RoundVec2(child.position);
+            Vector2 v = Main.RoundVec2(child.position);
 
             // Not inside Border?
-            if (!PlayField.InsideBorder(v))
+            if (!Main.InsideBorder(v))
             {
                 return false;
             }
@@ -21,13 +21,17 @@ public class Shape : MonoBehaviour
             try
             {
                 // Block in grid cell (and not part of same group)?
-                if (PlayField.grid[(int)v.x, (int)v.y] != null
-                    && PlayField.grid[(int)v.x, (int)v.y].parent != transform)
+                if (Main.Grid[(int)v.x, (int)v.y] != null
+                    && Main.Grid[(int)v.x, (int)v.y].parent != transform)
                 {
                     return false;
                 }
             }
             catch (System.IndexOutOfRangeException)
+            {
+                return true;
+            }
+            catch (System.NullReferenceException)
             {
                 return true;
             }
@@ -39,15 +43,15 @@ public class Shape : MonoBehaviour
     void UpdateGrid()
     {
         // Remove old children from grid
-        for (int y = 0; y < PlayField.h; ++y)
+        for (int y = 0; y < Main.FieldHeight; ++y)
         {
-            for (int x = 0; x < PlayField.w; ++x)
+            for (int x = 0; x < Main.FieldWidth; ++x)
             {
-                if (PlayField.grid[x, y] != null)
+                if (Main.Grid[x, y] != null)
                 {
-                    if (PlayField.grid[x, y].parent == transform)
+                    if (Main.Grid[x, y].parent == transform)
                     {
-                        PlayField.grid[x, y] = null;
+                        Main.Grid[x, y] = null;
                     }
                 }
             }
@@ -56,11 +60,11 @@ public class Shape : MonoBehaviour
         // Add new children to grid
         foreach (Transform child in transform)
         {
-            Vector2 v = PlayField.RoundVec2(child.position);
+            Vector2 v = Main.RoundVec2(child.position);
 
             try
             {
-                PlayField.grid[(int)v.x, (int)v.y] = child;
+                Main.Grid[(int)v.x, (int)v.y] = child;
             }
             catch (System.IndexOutOfRangeException)
             {
@@ -78,7 +82,12 @@ public class Shape : MonoBehaviour
 
     void Update()
     {
-        if (PlayField.isGameOver)
+        if (Main.gameState == Main.GameState.Ended)
+        {
+            return;
+        }
+
+        if (Main.isGameOver)
         {
             GameObject go = GameObject.Instantiate(Resources.Load("GameOver", typeof(GameObject))) as GameObject;
             Instantiate(go, new Vector3(4.5f, 9.5f, 0), Quaternion.identity);
@@ -156,13 +165,13 @@ public class Shape : MonoBehaviour
             }
             else
             {
-                PlayField.CheckGameOver();
+                Main.CheckGameOver();
 
                 // It's not valid. revert.
                 transform.position += new Vector3(0, 1, 0);
 
                 // Clear filled horizontal lines
-                PlayField.DeleteFullRows();
+                Main.DeleteFullRows();
 
                 // Spawn next Group
                 FindObjectOfType<Spawner>().SpawnNext();
@@ -173,10 +182,5 @@ public class Shape : MonoBehaviour
 
             lastFall = Time.time;
         }
-    }
-
-    void OnGUI()
-    {
-        GUI.Label(new Rect(5, 14, 100, 100), "Score: " + PlayField.score);
     }
 }
