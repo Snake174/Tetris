@@ -9,6 +9,22 @@ public class GameMode2 : MonoBehaviour, IGameStrategy
 
     public void DeleteFullRows()
     {
+        for (int y = 0; y < Main.FieldHeight; ++y)
+        {
+            if (y + 1 >= Main.FieldHeight)
+            {
+                break;
+            }
+
+            if (Main.IsRowFull(y) && Main.IsRowFull(y + 1))
+            {
+                Main.DeleteRow(y);
+                Main.DeleteRow(y + 1);
+                Main.DecreaseRowsAbove(y + 1);
+                Main.DecreaseRowsAbove(y + 1);
+                y -= 2;
+            }
+        }
     }
 
     public void IncScore()

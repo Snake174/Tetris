@@ -77,15 +77,7 @@ public class Main : MonoBehaviour
 
     public static void DeleteFullRows()
     {
-        for (int y = 0; y < FieldHeight; ++y)
-        {
-            if (IsRowFull(y))
-            {
-                DeleteRow(y);
-                DecreaseRowsAbove(y + 1);
-                --y;
-            }
-        }
+        GameStrategy.DeleteFullRows();
     }
 
     public static void CheckGameOver()

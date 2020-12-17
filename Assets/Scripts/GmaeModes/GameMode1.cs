@@ -9,6 +9,15 @@ public class GameMode1 : MonoBehaviour, IGameStrategy
 
     public void DeleteFullRows()
     {
+        for (int y = 0; y < Main.FieldHeight; ++y)
+        {
+            if (Main.IsRowFull(y))
+            {
+                Main.DeleteRow(y);
+                Main.DecreaseRowsAbove(y + 1);
+                --y;
+            }
+        }
     }
 
     public void IncScore()
